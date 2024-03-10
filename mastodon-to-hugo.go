@@ -510,7 +510,7 @@ func main() {
 	lvl.Set(slog.Level(cla.logLevelValue))
 	logger.Info("Welcome to Hugodon!")
 
-	// Unmarshal the data into
+	// Unmarshal the data and filter
 	outboxFilePath := path.Join(cla.inputRootPathExpandedArchive, "outbox.json")
 	outboxFeed, outboxFeedErr := newOutbox(outboxFilePath)
 	if outboxFeedErr != nil {
@@ -521,7 +521,7 @@ func main() {
 	outboxFeed.filterToots(selfPublishFilter)
 	logger.Info("Toots filtered", "totalCount", totalToots, "filteredCount", len(outboxFeed.OrderedItems))
 
-	// Transform the toots into documents.
+	// Render out the toots to disk
 	ensureDirectory(cla.outputRootPathHugoAssets, true, logger)
 	renderErr := renderTootsToDisk(cla.outputRootPathHugoAssets,
 		outboxFeed,
@@ -530,7 +530,7 @@ func main() {
 		logger.Error("Failed to render toots", "error", renderErr)
 		os.Exit(-1)
 	}
-	// Copy the tweets to the appropriate location
+	// Anything to cleanup?
 	for _, eachFunc := range cleanupFuncs {
 		eachFunc(logger)
 	}
